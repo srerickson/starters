@@ -1,0 +1,5 @@
+sqlboiler.toml
+go.sum
+**.sqlite3
+**.crt
+**.key
