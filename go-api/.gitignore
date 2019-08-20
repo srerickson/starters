@@ -1,3 +1,4 @@
+go-api
 sqlboiler.toml
 go.sum
 **.sqlite3

@@ -1,4 +1,4 @@
-module github.com/srerickson/go-api
+module github.com/srerickson/starters/go-api
 
 go 1.12
 
@@ -10,7 +10,6 @@ require (
 	github.com/kat-co/vala v0.0.0-20170210184112-42e1d8b61f12
 	github.com/lib/pq v1.2.0
 	github.com/magiconair/properties v1.8.1 // indirect
-	github.com/mattn/go-sqlite3 v1.11.0 // indirect
 	github.com/pelletier/go-toml v1.4.0 // indirect
 	github.com/pkg/errors v0.8.1
 	github.com/spf13/afero v1.2.2 // indirect
@@ -20,7 +19,6 @@ require (
 	github.com/volatiletech/inflect v0.0.0-20170731032912-e7201282ae8d // indirect
 	github.com/volatiletech/null v8.0.0+incompatible
 	github.com/volatiletech/sqlboiler v3.4.0+incompatible
-	github.com/volatiletech/sqlboiler-sqlite3 v0.0.0-20180915213852-a153537eb0c3 // indirect
 	golang.org/x/sys v0.0.0-20190813064441-fde4db37ae7a // indirect
 	golang.org/x/text v0.3.2 // indirect
 )

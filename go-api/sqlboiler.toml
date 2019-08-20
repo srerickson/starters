@@ -1,10 +1,10 @@
 [psql]
-    dbname = ""
+    dbname = "sre53"
     host   = "localhost"
     port   = 5432
-    user   = ""
-    pass   = ""
-    schema = ""
+    user   = "sre53"
+    pass   = "wordpass"
+    schema = "api"
     blacklist = ["migrations", "other"]
     sslmode = "disable"
 
