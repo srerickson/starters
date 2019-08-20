@@ -25,7 +25,7 @@ Create initial tables:
 
 #### Generate Models
 
-This project uses [sqlboiler](https://github.com/volatiletech/sqlboiler) to generate ORM models from the database schema. Start by setting `dbname`, `user`, and `pass` to the values used above (`POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`).
+This project uses [sqlboiler](https://github.com/volatiletech/sqlboiler) to generate ORM models from the database schema. Start by creating a file, `sqlboiler.toml`, using the values from above for `POSTGRES_DB`, `POSTGRES_USER`, and `POSTGRES_PASSWORD`.
 
 ``` toml
 # sqlboiler.toml
