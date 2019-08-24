@@ -2,19 +2,21 @@ package main
 
 import (
 	"crypto/tls"
+	"errors"
+	"fmt"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/gorilla/mux"
+	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
 )
 
-const staticDir = `static`
-const secretEnv = `API_SECRET`
+const configFileName = "api"
 
-var users = map[string]string{
-	`user1`: `secret1`,
-}
+var secret, addr, tlsCrt, tlsKey, prefix, staticDir, staticPrefix string
+var port int
+var serveTLS bool
 
 func apiHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -22,38 +24,69 @@ func apiHandler() http.Handler {
 	})
 }
 
+func config() error {
+	pflag.StringVar(&addr, "addr", "127.0.0.1", "server IP address")
+	pflag.IntVar(&port, "port", 8080, "server port")
+	pflag.BoolVar(&serveTLS, "tls", true, "wheather to run server using TLS")
+	pflag.StringVar(&tlsCrt, "tls-crt", "localhost.crt", "path to TLS cert")
+	pflag.StringVar(&tlsKey, "tls-key", "localhost.key", "path to TLS key")
+	pflag.StringVar(&prefix, "prefix", "/api", "api prefix")
+	pflag.StringVar(&staticDir, "static-dir", "static", "path to static directory")
+	pflag.StringVar(&staticPrefix, "static-prefix", "/static", "path to static directory")
+	pflag.Parse()
+	viper.BindPFlags(pflag.CommandLine)
+	viper.BindEnv("API_SECRET", "secret") // environment variable
+	viper.SetConfigName(configFileName)
+	viper.AddConfigPath(".")                     // path to look for the config file in
+	if err := viper.ReadInConfig(); err != nil { // Handle errors reading the config file
+		return err
+	}
+	secret = viper.GetString("secret")
+	if secret == "" {
+		return errors.New("secret seed not set")
+	}
+	return nil
+}
+
 func main() {
-	if os.Getenv(secretEnv) == "" {
-		log.Fatalf("environment variable not set: %s", secretEnv)
+
+	if err := config(); err != nil {
+		log.Fatalf("config error: %s", err)
 	}
+
 	root := mux.NewRouter()
-	apiRoute := root.PathPrefix(`/api`).Subrouter()
+
+	// API Routes
+	apiRoute := root.PathPrefix(prefix).Subrouter()
 	apiRoute.Use(authMiddleware)
-	apiRoute.Handle(``, apiHandler())
+	apiRoute.Handle("", apiHandler())
 
-	// Static Files
-	root.PathPrefix("/static").Handler(http.StripPrefix("/static", http.FileServer(http.Dir(staticDir))))
+	// Static File Routes
+	root.PathPrefix(staticPrefix).Handler(http.StripPrefix(staticPrefix, http.FileServer(http.Dir(staticDir))))
 
-	// TLS config
-	cfg := &tls.Config{
-		MinVersion:               tls.VersionTLS12,
-		CurvePreferences:         []tls.CurveID{tls.CurveP521, tls.CurveP384, tls.CurveP256},
-		PreferServerCipherSuites: true,
-		CipherSuites: []uint16{
-			tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
-			tls.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,
-			tls.TLS_RSA_WITH_AES_256_GCM_SHA384,
-			tls.TLS_RSA_WITH_AES_256_CBC_SHA,
-		},
+	if serveTLS {
+		cfg := &tls.Config{
+			MinVersion:               tls.VersionTLS12,
+			CurvePreferences:         []tls.CurveID{tls.CurveP521, tls.CurveP384, tls.CurveP256},
+			PreferServerCipherSuites: true,
+			CipherSuites: []uint16{
+				tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
+				tls.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,
+				tls.TLS_RSA_WITH_AES_256_GCM_SHA384,
+				tls.TLS_RSA_WITH_AES_256_CBC_SHA,
+			},
+		}
+		srv := &http.Server{
+			Addr:         fmt.Sprintf("%s:443", addr),
+			Handler:      root,
+			TLSConfig:    cfg,
+			TLSNextProto: make(map[string]func(*http.Server, *tls.Conn, http.Handler), 0),
+		}
+		log.Printf("listening on %s (w/ TLS)", addr)
+		log.Fatal(srv.ListenAndServeTLS(tlsCrt, tlsKey))
+		return
 	}
-	srv := &http.Server{
-		Addr:         ":443",
-		Handler:      root,
-		TLSConfig:    cfg,
-		TLSNextProto: make(map[string]func(*http.Server, *tls.Conn, http.Handler), 0),
-	}
-	log.Fatal(srv.ListenAndServeTLS("localhost.crt", "localhost.key"))
-
-	// log.Fatal(http.ListenAndServe(`127.0.0.1:8080`, root))
-
+	addrPort := fmt.Sprintf("%s:%d", addr, port)
+	log.Printf("listening on %s", addrPort)
+	log.Fatal(http.ListenAndServe(addrPort, root))
 }
