@@ -4,4 +4,4 @@ go.sum
 **.sqlite3
 **.crt
 **.key
-api.toml
+api.yml
