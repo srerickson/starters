@@ -10,7 +10,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-const envDB = `DB_TEST_URL`
+const envDB = `API_DB`
 
 func TestMain(m *testing.M) {
 	dbURL := os.Getenv(envDB)

@@ -23,12 +23,6 @@ func init() {
 	flag.BoolVar(&verbose, "v", false, "verbose")
 }
 
-func apiHandler() http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(`what`))
-	})
-}
-
 func main() {
 	flag.Parse()
 
@@ -45,6 +39,7 @@ func main() {
 
 	// Routing
 	root := chi.NewRouter()
+	root.Use(goapi.AuthMiddleware)
 
 	resource.Init(db, `api.resources`)
 	root.Mount("/resources", resource.Handler())

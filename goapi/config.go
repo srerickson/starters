@@ -16,21 +16,17 @@ const (
 // Config holds main config options for the server
 type Config struct {
 	Secret       string
-	DatabaseURL  string `yaml:"database"`
-	ServerNet    string `yaml:"net"`
-	ServerPort   int    `yaml:"port"`
-	ServeTLS     bool   `yaml:"tls"`
-	TLSCrt       string `yaml:"tls-crt"`
-	TLSKey       string `yaml:"tls-key"`
-	Prefix       string `yaml:"api-path-prefix"`
-	StaticPrefix string `yaml:"static-path-prefix"`
-	StaticDir    string `yaml:"static-dir"`
-	Auths        []struct {
-		ID        string `yaml:"id"`
-		KeyDigest string `yaml:"key-digest"`
-		Roles     []string
-	} `yaml:"auths"`
-	Verbose bool
+	DatabaseURL  string              `yaml:"database"`
+	ServerNet    string              `yaml:"net"`
+	ServerPort   int                 `yaml:"port"`
+	ServeTLS     bool                `yaml:"tls"`
+	TLSCrt       string              `yaml:"tls-crt"`
+	TLSKey       string              `yaml:"tls-key"`
+	Prefix       string              `yaml:"api-path-prefix"`
+	StaticPrefix string              `yaml:"static-path-prefix"`
+	StaticDir    string              `yaml:"static-dir"`
+	Auths        map[string][]string `yaml:"auths"` // map of id -> roles
+	Verbose      bool
 }
 
 // defaults
