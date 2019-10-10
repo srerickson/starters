@@ -1,4 +1,4 @@
-package main
+package goapi
 
 import (
 	"fmt"
@@ -8,7 +8,8 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-func authMiddleware(next http.Handler) http.Handler {
+// AuthMiddleware is middleware of JWT-based authorization
+func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		auth := r.Header.Get("Authorization")
 		if auth == "" {

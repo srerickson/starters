@@ -23,24 +23,6 @@ Create initial tables:
 \i db/psql/schema.sql
 ```
 
-#### Generate Models
-
-This project uses [sqlboiler](https://github.com/volatiletech/sqlboiler) to generate ORM models from the database schema. Start by creating a file, `sqlboiler.toml`, using the values from above for `POSTGRES_DB`, `POSTGRES_USER`, and `POSTGRES_PASSWORD`.
-
-``` toml
-# sqlboiler.toml
-[psql]
-    dbname = "dbname"
-    host   = "localhost"
-    port   = 5432
-    user   = "user_name"
-    pass   = "wordpass"
-    schema = "api"
-    blacklist = ["migrations", "other"]
-    sslmode = "disable"
-
-```
-
 #### Create self-signed TLS Certificate for development
 
 ```bash

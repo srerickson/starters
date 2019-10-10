@@ -5,3 +5,4 @@ go.sum
 **.crt
 **.key
 api.yml
+tmp
